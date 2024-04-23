@@ -12,7 +12,7 @@ def load_data():
     df_movies = pd.read_csv('movie.csv')
     df_ratings = pd.read_csv('rating.csv')
 
-    # Rename columns
+    
     df_movies.rename(columns={'movieId': 'mID', 'title': 'title', 'genres': 'genres'}, inplace=True)
     df_ratings.rename(columns={'userId': 'uID', 'movieId': 'mID', 'rating': 'rating'}, inplace=True)
 
@@ -22,7 +22,6 @@ def load_data():
 df_movies, df_ratings = load_data()
 
 
-# Data preprocessing and recommendation system
 class RecSys():
     def __init__(self, data):
         self.data = data
@@ -68,7 +67,6 @@ class HybridRecSys(RecSys):
         self.sim_dis = similar_movies_distances
 
 
-# Initialize recommendation system
 data = namedtuple('Data', ['users', 'movies', 'ratings'])
 data.users = pd.DataFrame({'uID': df_ratings['uID'].unique()})
 data.movies = df_movies
@@ -77,11 +75,11 @@ data.ratings = df_ratings
 HRS = HybridRecSys(data)
 
 
-# Streamlit app
+
 def main():
     st.title("Movie Recommendation System")
 
-    # Movie input
+    
     movie_title = st.text_input("Enter a movie title:", "Old School")
 
     # Recommendation button
