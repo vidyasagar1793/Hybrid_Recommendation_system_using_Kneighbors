@@ -82,12 +82,12 @@ def main():
     
     movie_title = st.text_input("Enter a movie title:", "Old School")
 
-    # Recommendation button
+    
     if st.button("Get Recommendations"):
         recommend_movies(movie_title)
 
 
-# Recommendation function
+
 def recommend_movies(movie_title):
     matching_movies = df_movies[df_movies['title'].str.contains(movie_title, case=False)]
 
