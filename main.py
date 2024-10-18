@@ -7,22 +7,20 @@ from sklearn.neighbors import NearestNeighbors
 from scipy.sparse import csr_matrix
 
 
-
 def load_data():
     df_movies = pd.read_csv('movie.csv')
     df_ratings = pd.read_csv('rating.csv')
 
-    
     df_movies.rename(columns={'movieId': 'mID', 'title': 'title', 'genres': 'genres'}, inplace=True)
     df_ratings.rename(columns={'userId': 'uID', 'movieId': 'mID', 'rating': 'rating'}, inplace=True)
 
     return df_movies, df_ratings
 
 
-df_movies, df_ratings = load_data()
+df_movies, df_ratings=load_data()
 
 
-class RecSys():
+class RecSys:
     def __init__(self, data):
         self.data = data
         self.allusers = list(self.data.users['uID'])
@@ -52,7 +50,7 @@ class HybridRecSys(RecSys):
 
     def calc_movie_feature_matrix(self):
         df_movies_genres = df_movies.drop(columns=['mID', 'title'])
-        genres_matrix = df_movies_genres.values
+        genres_matrix = df_movies_genres.apply(pd.to_numeric, errors='coerce').fillna(0).values
         movie_feature_matrix = np.concatenate([genres_matrix, self.Mr.T], axis=1)
         return movie_feature_matrix
 
@@ -75,17 +73,13 @@ data.ratings = df_ratings
 HRS = HybridRecSys(data)
 
 
-
 def main():
     st.title("Movie Recommendation System")
 
-    
     movie_title = st.text_input("Enter a movie title:", "Old School")
 
-    
     if st.button("Get Recommendations"):
         recommend_movies(movie_title)
-
 
 
 def recommend_movies(movie_title):
@@ -94,8 +88,7 @@ def recommend_movies(movie_title):
     if not matching_movies.empty:
         movie_ids_to_recommend = matching_movies['mID'].values
         for movie_id_to_recommend in movie_ids_to_recommend:
-            movie_title_to_recommend = \
-            HRS.data.movies.loc[HRS.data.movies['mID'] == movie_id_to_recommend, 'title'].values[0]
+            movie_title_to_recommend = HRS.data.movies.loc[HRS.data.movies['mID'] == movie_id_to_recommend, 'title'].values[0]
             genres_of_recommend = [genre for genre, value in zip(HRS.genres, HRS.Mm[HRS.mid2idx[movie_id_to_recommend]])
                                    if value == 1]
             movie_idx = HRS.mid2idx.get(movie_id_to_recommend)
@@ -114,8 +107,7 @@ def recommend_movies(movie_title):
             for i, movie_id in enumerate(top_movie_ids):
                 movie_title = HRS.data.movies.loc[HRS.data.movies['mID'] == movie_id, 'title'].values[0]
                 movie_genres = [genre for genre, value in zip(HRS.genres, HRS.Mm[HRS.mid2idx[movie_id]]) if value == 1]
-                st.markdown(
-                    f"{movie_title} - ({', '.join(movie_genres)}) - (Similarity Score: {similar_movies_scores[i]:.4f})")
+                st.markdown(f"{movie_title} - ({', '.join(movie_genres)}) - (Similarity Score: {similar_movies_scores[i]:.4f})")
 
     else:
         st.write('Movie not found in the database')
